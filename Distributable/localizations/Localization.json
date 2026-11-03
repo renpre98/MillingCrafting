@@ -1,0 +1,14 @@
+{
+    "MC_Action_Repair": {
+        "English": "Repair",
+        "German": "Reparieren"
+    },
+    "MC_Action_Craft": {
+        "English": "Fabricate",
+        "German": "Fertigen"
+    },
+    "MC_Location_Milling": {
+        "English": "Milling Machine",
+        "German": "Fräse"
+    }
+}

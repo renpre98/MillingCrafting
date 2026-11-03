@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!--Path to the game. Override on the command line with -p:TheLongDarkPath=...-->
+    <TheLongDarkPath Condition="'$(TheLongDarkPath)' == '' And '$(OS)' == 'Windows_NT'">C:\Program Files (x86)\Steam\steamapps\common\TheLongDark</TheLongDarkPath>
+    <TheLongDarkPath Condition="'$(TheLongDarkPath)' == ''">$(HOME)/.local/share/Steam/steamapps/common/TheLongDark</TheLongDarkPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>Latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DebugType>none</DebugType>
+    <!--Polyfill in BuildSupport/ replaces the NullableAttribute that Unity 6's CoreModule exposes.-->
+    <NoWarn>$(NoWarn);CS0436</NoWarn>
+  </PropertyGroup>
+
+  <!--Compile against the game's own MelonLoader-generated assemblies so API changes show up as compile errors.-->
+  <ItemDefinitionGroup>
+    <Reference>
+      <Private>False</Private>
+    </Reference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/MelonLoader.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/0Harmony.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/Il2CppInterop.Runtime.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/net6/Il2CppInterop.Common.dll" />
+    <Reference Include="$(TheLongDarkPath)/MelonLoader/Il2CppAssemblies/*.dll" />
+    <Reference Include="$(TheLongDarkPath)/Mods/ModSettings.dll" />
+  </ItemGroup>
+
+  <!--Pack Distributable/ (blueprints, localization) into the .modcomponent next to the dll.-->
+  <Target Name="PackModComponent" AfterTargets="Build">
+    <Delete Files="$(TargetDir)$(AssemblyName).modcomponent" />
+    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)/Distributable" DestinationFile="$(TargetDir)$(AssemblyName).modcomponent" Overwrite="true" />
+  </Target>
+
+  <Target Name="CopyToMods" AfterTargets="PackModComponent" Condition="'$(CopyToMods)' == 'true'">
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(AssemblyName).modcomponent" DestinationFolder="$(TheLongDarkPath)/Mods" />
+  </Target>
+
+</Project>
