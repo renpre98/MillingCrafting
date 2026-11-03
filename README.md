@@ -7,6 +7,11 @@ Interacting with a milling machine shows two actions:
 - **Repair**: the vanilla repair menu, unchanged.
 - **Fabricate**: opens the crafting menu at the milling machine. It shows only blueprints made for the milling machine, and those blueprints do not show up at workbenches.
 
+<p>
+  <img src="docs/action-picker.jpg" alt="Action picker at the milling machine: Repair and Fabricate" width="49%">
+  <img src="docs/crafting-menu.jpg" alt="Crafting menu at the milling machine, with Milling Machine as the required location" width="49%">
+</p>
+
 As in vanilla, the milling machine needs electricity. That means an aurora, a power provider from another mod (for example a generator, see [Power API](#power-api-for-mod-authors)), or the cheat setting below.
 
 > **Status:** prototype (0.2.0). It includes one test recipe (hunting knife from an improvised knife and scrap metal). Real recipes and balancing will follow.
