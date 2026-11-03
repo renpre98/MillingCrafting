@@ -50,9 +50,7 @@ Any ModComponent mod can add milling recipes; there is no code dependency. Write
     "CraftedResult": "GEAR_Knife",
     "CraftedResultCount": 1,
     "DurationMinutes": 90,
-    "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR",
-    "AppliedSkill": "None",
-    "ImprovedSkill": "None"
+    "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR"
 }
 ```
 
@@ -93,6 +91,8 @@ dotnet build -c Release -p:CopyToMods=true    # also copy into the game's Mods f
 ```
 
 The game path defaults to the Steam library on Linux (`~/.local/share/Steam/steamapps/common/TheLongDark`) or Windows. Override it with `-p:TheLongDarkPath=…`.
+
+Name, version, author and link are set once in `MillingCrafting.csproj`; the MelonLoader info and the `BuildInfo.json` inside the `.modcomponent` are generated from them.
 
 `BuildSupport/` holds a small polyfill for a compiler conflict with Unity 6's `NullableAttribute`.
 

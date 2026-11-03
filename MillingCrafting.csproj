@@ -6,12 +6,36 @@
     <TheLongDarkPath Condition="'$(TheLongDarkPath)' == ''">$(HOME)/.local/share/Steam/steamapps/common/TheLongDark</TheLongDarkPath>
   </PropertyGroup>
 
+  <!--Mod name, version and author live only here: the MelonInfo attribute and the BuildInfo.json in
+      the .modcomponent are generated from them.-->
+  <PropertyGroup>
+    <AssemblyName>MillingCrafting</AssemblyName>
+    <Version>0.2.0</Version>
+    <Authors>Reno98</Authors>
+    <Copyright>Created by Reno98</Copyright>
+    <RepositoryUrl>https://github.com/renpre98/MillingCrafting</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="MelonLoader.MelonInfoAttribute">
+      <_Parameter1>typeof(MillingCrafting.MillingCraftingMod)</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      <_Parameter2>$(AssemblyName)</_Parameter2>
+      <_Parameter3>$(Version)</_Parameter3>
+      <_Parameter4>$(Authors)</_Parameter4>
+      <_Parameter5>$(RepositoryUrl)</_Parameter5>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="MelonLoader.MelonGameAttribute">
+      <_Parameter1>Hinterland</_Parameter1>
+      <_Parameter2>TheLongDark</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>Latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <DebugType>none</DebugType>
     <!--Polyfill in BuildSupport/ replaces the NullableAttribute that Unity 6's CoreModule exposes.-->
     <NoWarn>$(NoWarn);CS0436</NoWarn>
@@ -32,10 +56,24 @@
     <Reference Include="$(TheLongDarkPath)/Mods/ModSettings.dll" />
   </ItemGroup>
 
-  <!--Pack Distributable/ (blueprints, localization) into the .modcomponent next to the dll.-->
+  <!--Pack Distributable/ (blueprints, localization) plus a generated BuildInfo.json into the
+      .modcomponent next to the dll.-->
   <Target Name="PackModComponent" AfterTargets="Build">
-    <Delete Files="$(TargetDir)$(AssemblyName).modcomponent" />
-    <ZipDirectory SourceDirectory="$(MSBuildProjectDirectory)/Distributable" DestinationFile="$(TargetDir)$(AssemblyName).modcomponent" Overwrite="true" />
+    <PropertyGroup>
+      <ModComponentStaging>$(IntermediateOutputPath)modcomponent/</ModComponentStaging>
+    </PropertyGroup>
+    <ItemGroup>
+      <ModComponentFile Include="$(MSBuildProjectDirectory)/Distributable/**/*" />
+      <BuildInfoLine Include="{" />
+      <BuildInfoLine Include="    &quot;Name&quot;: &quot;$(AssemblyName)&quot;," />
+      <BuildInfoLine Include="    &quot;Version&quot;: &quot;$(Version)&quot;," />
+      <BuildInfoLine Include="    &quot;Author&quot;: &quot;$(Authors)&quot;" />
+      <BuildInfoLine Include="}" />
+    </ItemGroup>
+    <RemoveDir Directories="$(ModComponentStaging)" />
+    <Copy SourceFiles="@(ModComponentFile)" DestinationFiles="@(ModComponentFile->'$(ModComponentStaging)%(RecursiveDir)%(Filename)%(Extension)')" />
+    <WriteLinesToFile File="$(ModComponentStaging)BuildInfo.json" Lines="@(BuildInfoLine)" Overwrite="true" />
+    <ZipDirectory SourceDirectory="$(ModComponentStaging)" DestinationFile="$(TargetDir)$(AssemblyName).modcomponent" Overwrite="true" />
   </Target>
 
   <Target Name="CopyToMods" AfterTargets="PackModComponent" Condition="'$(CopyToMods)' == 'true'">

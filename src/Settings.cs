@@ -11,7 +11,7 @@ internal sealed class MillingSettings : JsonModSettings
 
     [Section("Debug")]
     [Name("Debug logging")]
-    [Description("Writes diagnostic messages (first call of each patch, stations, power) to the MelonLoader log.")]
+    [Description("Writes diagnostic messages (stations, power changes) to the MelonLoader log.")]
     public bool DebugLogging = false;
 }
 

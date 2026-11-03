@@ -4,17 +4,10 @@
         { "Item": "GEAR_KnifeImprovised", "Count": 1 },
         { "Item": "GEAR_ScrapMetal", "Count": 2 }
     ],
-    "KeroseneLitersRequired": 0,
-    "GunpowderKGRequired": 0,
-    "RequiredTool": "",
-    "OptionalTools": [],
     "RequiredCraftingLocation": "Workbench",
-    "RequiresLitFire": false,
     "RequiresLight": true,
     "CraftedResult": "GEAR_Knife",
     "CraftedResultCount": 1,
     "DurationMinutes": 90,
-    "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR",
-    "AppliedSkill": "None",
-    "ImprovedSkill": "None"
+    "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR"
 }

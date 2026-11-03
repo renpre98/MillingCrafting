@@ -25,6 +25,7 @@ internal static class MillingPower
     private sealed class MachineState
     {
         public MillingMachine Machine = null!;
+        public SimpleInteraction? Interaction;
         public AuroraModularElectrolizer[] Lamps = Array.Empty<AuroraModularElectrolizer>();
         public bool Powered;
     }
@@ -35,13 +36,6 @@ internal static class MillingPower
     // Native pointers of the lamps (electrolizers) of powered machines. Read by the HasActivePower postfix,
     // which may run on job worker threads - so that postfix must stay free of Unity calls.
     private static readonly ConcurrentDictionary<IntPtr, byte> s_PoweredLamps = new();
-
-    private static bool s_SelfTested;
-
-    internal static readonly Type[] Patches =
-    {
-        typeof(PowerOnInitialize), typeof(ForcePower), typeof(MachineUpdate), typeof(PanelUpdate), typeof(PanelRepair), typeof(MachineLights),
-    };
 
     private struct Electricity
     {
@@ -63,10 +57,11 @@ internal static class MillingPower
         state = new MachineState
         {
             Machine = machine,
+            Interaction = machine.GetComponent<SimpleInteraction>(),
             Lamps = machine.GetComponentsInChildren<AuroraModularElectrolizer>(true).ToArray(),
         };
         s_Machines[id] = state;
-        MillingCraftingMod.Debug($"Milling machine '{machine.gameObject.name}' registered ({state.Lamps.Length} lamp(s))");
+        MillingCraftingMod.LogDebug($"Milling machine '{machine.gameObject.name}' registered ({state.Lamps.Length} lamp(s))");
         return state;
     }
 
@@ -79,6 +74,7 @@ internal static class MillingPower
             return;
         }
         state.Powered = powered;
+        bool aurora = ElectrostaticForce._IsActive_k__BackingField;
         foreach (AuroraModularElectrolizer lamp in state.Lamps)
         {
             if (powered)
@@ -88,9 +84,15 @@ internal static class MillingPower
             else
             {
                 s_PoweredLamps.TryRemove(lamp.Pointer, out _);
+                // nothing switches the lamps off again without an aurora change; StopAll is the game's
+                // own "light, glow and sound off" (during a real aurora the game drives them anyway)
+                if (!aurora && lamp)
+                {
+                    lamp.StopAll();
+                }
             }
         }
-        MillingCraftingMod.Debug($"Milling machine '{state.Machine.gameObject.name}' power without aurora: {powered}");
+        MillingCraftingMod.LogDebug($"Milling machine '{state.Machine.gameObject.name}' power without aurora: {powered}");
     }
 
     // Returns true if the electricity was faked and must be restored with EndElectricity.
@@ -113,11 +115,6 @@ internal static class MillingPower
         ElectrostaticForce._IsFullyActive_k__BackingField = true;
         ElectrostaticForce._NormalizedActive_k__BackingField = 1f;
         ElectrostaticForce._Strength_k__BackingField = 1f;
-        if (!s_SelfTested)
-        {
-            s_SelfTested = true;
-            MillingCraftingMod.Debug($"Faking electricity for the milling machine: IsActive={ElectrostaticForce.IsActive} (real: {saved.Active}, strength {saved.Strength})");
-        }
         return true;
     }
 
@@ -132,25 +129,9 @@ internal static class MillingPower
         }
     }
 
-    [HarmonyPatch(typeof(MillingMachine), nameof(MillingMachine.InitializeInteraction))]
-    private static class PowerOnInitialize
-    {
-        private static void Postfix(MillingMachine __instance)
-        {
-            Trace.First(nameof(PowerOnInitialize));
-            try
-            {
-                UpdatePower(GetState(__instance));
-            }
-            catch (Exception e)
-            {
-                MillingCraftingMod.Warn("Could not register milling machine: " + e);
-            }
-        }
-    }
-
-    // HasActivePower has real logic (16 xrefs), so it is not folded with unrelated methods like
-    // WorkBench.GetLocation was. Keep this postfix to a dictionary lookup: no Unity API, no Trace.
+    // HasActivePower has real logic, so it is not folded with unrelated methods like WorkBench.GetLocation
+    // was. It is called from AuroraModularElectrolizer.ManualUpdate, which the game also runs from
+    // JobUpdate - so keep this postfix to a thread-safe dictionary lookup without Unity API calls.
     [HarmonyPatch(typeof(AuroraModularElectrolizer), nameof(AuroraModularElectrolizer.HasActivePower))]
     private static class ForcePower
     {
@@ -173,17 +154,11 @@ internal static class MillingPower
     {
         private static void Postfix(MillingMachine __instance)
         {
-            Trace.First(nameof(MachineUpdate));
             MachineState state = GetState(__instance);
             UpdatePower(state);
-            if (!state.Powered)
+            if (state.Powered && state.Interaction && !state.Interaction!.m_CanInteract)
             {
-                return;
-            }
-            SimpleInteraction? si = __instance.GetComponent<SimpleInteraction>();
-            if (si && !si!.m_CanInteract)
-            {
-                si.m_CanInteract = true;
+                state.Interaction.m_CanInteract = true;
             }
         }
     }
@@ -194,7 +169,6 @@ internal static class MillingPower
     {
         private static void Prefix(Panel_Milling __instance, out (bool faked, Electricity saved) __state)
         {
-            Trace.First(nameof(PanelUpdate));
             __state.faked = BeginElectricity(__instance.m_Machine, out __state.saved);
         }
 
@@ -212,7 +186,6 @@ internal static class MillingPower
 
         private static void Prefix(Panel_Milling __instance, out (bool faked, Electricity saved) __state)
         {
-            Trace.First(nameof(PanelRepair));
             __state.faked = BeginElectricity(__instance.m_Machine, out __state.saved);
         }
 
@@ -233,7 +206,6 @@ internal static class MillingPower
             {
                 return;
             }
-            Trace.First(nameof(MachineLights));
             bool aurora = __instance.AuroraIsActive();
             foreach (KeyValuePair<int, MachineState> entry in s_Machines)
             {
