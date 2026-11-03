@@ -99,8 +99,13 @@ The game path defaults to the Steam library on Linux (`~/.local/share/Steam/stea
 ## Credits
 
 - Lighting the machine's lamps without an aurora uses the same approach as [House Lights](https://github.com/DemonBunnyBon/tld-house-lights) by DemonBunnyBon.
+- Claude for helping with the games functions
 
 Author: Reno98
+
+## Thanks  
+ds5678 for the modcomponent mod and also to dommrogers who keeps that mod alive.  
+As modcomponent brought me into modding TLD and Unity in general :)
 
 ## License
 
