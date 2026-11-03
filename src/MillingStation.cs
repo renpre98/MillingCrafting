@@ -24,9 +24,11 @@ internal static class MillingStation
 {
     private const string StationName = "MillingCraftingStation";
 
-    // A WorkBench added at runtime starts with 0 for both; these are the values a vanilla workbench had in 2.59.
-    private const float StationTimeModifier = -20f;
-    private const float StationSkillModifier = 25f;
+    // Neutral station: no bonus or malus of its own. Note that the game still multiplies a blueprint's
+    // DurationMinutes by the selected tool's m_CraftingAndRepairTimeModifier (Panel_Crafting.GetModifiedCraftingDuration),
+    // so better tools craft faster.
+    private const float StationTimeModifier = 0f;
+    private const float StationSkillModifier = 0f;
 
     // sprites from the game's UI atlas
     private const string CraftSprite = "ico_crafting";

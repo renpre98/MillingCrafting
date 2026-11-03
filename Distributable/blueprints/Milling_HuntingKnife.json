@@ -2,12 +2,15 @@
     "Name": "Milling_HuntingKnife",
     "RequiredGear": [
         { "Item": "GEAR_KnifeImprovised", "Count": 1 },
-        { "Item": "GEAR_ScrapMetal", "Count": 2 }
+        { "Item": "GEAR_Softwood", "Count": 1 },
+        { "Item": "GEAR_ScrapMetal", "Count": 1 }
     ],
+    "RequiredTool": "GEAR_SimpleTools",
+    "OptionalTools": [ "GEAR_HighQualityTools" ],
     "RequiredCraftingLocation": "Workbench",
     "RequiresLight": true,
     "CraftedResult": "GEAR_Knife",
     "CraftedResultCount": 1,
-    "DurationMinutes": 90,
+    "DurationMinutes": 180,
     "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR"
 }

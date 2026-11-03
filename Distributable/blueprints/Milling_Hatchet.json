@@ -1,0 +1,16 @@
+{
+    "Name": "Milling_Hatchet",
+    "RequiredGear": [
+        { "Item": "GEAR_HatchetImprovised", "Count": 1 },
+        { "Item": "GEAR_Hardwood", "Count": 1 },
+        { "Item": "GEAR_ScrapMetal", "Count": 2 }
+    ],
+    "RequiredTool": "GEAR_SimpleTools",
+    "OptionalTools": [ "GEAR_HighQualityTools" ],
+    "RequiredCraftingLocation": "Workbench",
+    "RequiresLight": true,
+    "CraftedResult": "GEAR_Hatchet",
+    "CraftedResultCount": 1,
+    "DurationMinutes": 240,
+    "CraftingAudio": "PLAY_MILLINGMACHINEREPAIR"
+}

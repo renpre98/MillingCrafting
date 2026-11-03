@@ -14,7 +14,16 @@ Interacting with a milling machine shows two actions:
 
 As in vanilla, the milling machine needs electricity. That means an aurora, a power provider from another mod (for example a generator, see [Power API](#power-api-for-mod-authors)), or the cheat setting below.
 
-> **Status:** prototype (0.2.0). It includes one test recipe (hunting knife from an improvised knife and scrap metal). Real recipes and balancing will follow.
+> **Status:** prototype (0.2.0). More recipes and balancing will follow.
+
+## Recipes
+
+Turn improvised tools into real ones. Each recipe needs simple tools or high quality tools. As in vanilla, the tool speeds up the work: simple tools take 25% less time, high quality tools 50% less.
+
+| Result | Ingredients | Base time |
+|---|---|---|
+| Hunting Knife | Improvised Knife, Cedar Firewood (handle), Scrap Metal | 3 h |
+| Hatchet | Improvised Hatchet, Fir Firewood (handle), 2 Scrap Metal | 4 h |
 
 ## Requirements
 
