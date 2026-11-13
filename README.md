@@ -27,7 +27,7 @@ Turn improvised tools into real ones. Each recipe needs simple tools or high qua
 
 ## Requirements
 
-- The Long Dark 2.59
+- The Long Dark 2.59 or 2.60 (tested on 2.60 with MelonLoader 0.7.2)
 - [MelonLoader](https://github.com/LavaGang/MelonLoader) 0.7.x
 - [ModComponent](https://github.com/dommrogers/ModComponent) (loads the blueprints and localization)
 - [ModSettings](https://github.com/DigitalzombieTLD/ModSettings)
